@@ -11,6 +11,7 @@ public class ThirdPersonMovement : MonoBehaviour
     [SerializeField] float horizontalInput;
     [SerializeField] float verticalInput;
 
+
     [Header("Wing trail effects")]
     [Range(0.01f, 1f)]
     [SerializeField] float trailThickness;
@@ -34,8 +35,9 @@ public class ThirdPersonMovement : MonoBehaviour
     [Range(1f,50f)]
     [SerializeField] float deceleration = 2f;
 
-    [Range(0.05f,1f)]
+    [Range(0.05f,10f)]
     [SerializeField] float turnSmoothTime = 0.1f;
+
 
     [Range(1f,50f)]
     [SerializeField] float heightMovementMaxSpeed = 5f;
@@ -126,8 +128,9 @@ public class ThirdPersonMovement : MonoBehaviour
 
 
         // process input event
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+
+        verticalInput = Input.GetAxisRaw("Vertical");
 
       
 
@@ -240,15 +243,27 @@ public class ThirdPersonMovement : MonoBehaviour
 
     void ProcessTurnRotation(Vector3 direction)
     {
-        float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+        // flying car forward follow current camera forward
+        float targetAngleY = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
 
-        float angleY = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVeloctiy, turnSmoothTime);
+        //flying car forward don't follow current camera forward
+        //float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+
+        float angleY = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngleY, ref turnSmoothVeloctiy, turnSmoothTime);
 
         //float angleX = Mathf.SmoothDampAngle(transform.eulerAngles.x, cam.eulerAngles.x, ref turnSmoothVeloctiy, turnSmoothTime);
 
         //transform.rotation = Quaternion.Euler(0f, angleY, 0f);
 
+        
+        
+        
         transform.rotation = Quaternion.Euler(0f, angleY, 0f);
+
+       
+
+
+       // transform.Rotate(Vector3.forward * -direction.x * 500 * Time.deltaTime);
 
 
         if (horizontalInput > 0)
@@ -265,8 +280,6 @@ public class ThirdPersonMovement : MonoBehaviour
             {
                 rotationThrusterAudio.PlayOneShot(rotationThrusterSoundSource);
             }
-
-
 
         }
         else if (horizontalInput < 0)
@@ -353,7 +366,7 @@ public class ThirdPersonMovement : MonoBehaviour
     // move the car upward or downward
     void ProcessHeightMovement()
     {
-        if (Input.GetKey(KeyCode.Q))
+        if (Input.GetKey(KeyCode.Space))
         {
             //car fly up
             controller.Move(transform.up * heightUpwardCurrentSpeed * Time.deltaTime);
@@ -373,7 +386,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
 
         }
-        else if (Input.GetKey(KeyCode.E))
+        else if (Input.GetKey(KeyCode.LeftControl))
         {
             //car fly down
             controller.Move(transform.up * heightDownwardCurrentSpeed * Time.deltaTime);
