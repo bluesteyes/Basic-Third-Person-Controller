@@ -419,6 +419,7 @@ public class ThirdPersonMovement : MonoBehaviour
     {
 
         if (heightUpwardCurrentSpeed > 0)
+       
         {
             heightUpwardCurrentSpeed -= heightMovementDeceleration * Time.deltaTime;
         }
